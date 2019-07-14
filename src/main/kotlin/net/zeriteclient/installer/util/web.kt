@@ -1,5 +1,7 @@
 package net.zeriteclient.installer.util
 
+import com.jfoenix.controls.JFXProgressBar
+import javafx.scene.text.Text
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -64,5 +66,17 @@ class ProgressResponseBody(val responseBody: ResponseBody,
                 return read
             }
         }
+    }
+}
+
+fun downloadFile(url: String,
+                 downloadFile: File,
+                 progressBar: JFXProgressBar?,
+                 progressText: Text?) {
+    downloadFile(url, downloadFile) { bytesRead, contentLength, _ ->
+        val percent = bytesRead.toDouble() / contentLength
+        if (percent <= 0) return@downloadFile
+        progressBar!!.progress = percent
+        progressText!!.text = "${(percent * 100).toInt()}% Complete"
     }
 }

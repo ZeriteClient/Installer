@@ -24,7 +24,7 @@ class InstallerUI : View("Zerite Installer") {
         tab(VersionSelector())
         tab(FeaturesSelector())
         tab(InstallingStage())
-        setOnKeyPressed { if (it.code == KeyCode.TAB && it.isControlDown) it.consume() }
+//        setOnKeyPressed { if (it.code == KeyCode.TAB && it.isControlDown) it.consume() }
     }
 
     init {

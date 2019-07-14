@@ -112,23 +112,16 @@ class InstallingStage : View() {
                         file.copyTo(zeriteLibraryJar, true)
                     } else {
                         // Download Zerite
-                        downloadFile(download, zeriteLibraryJar) { bytesRead, contentLength, _ ->
-                            val percent = bytesRead.toDouble() / contentLength
-                            progressBar!!.progress = percent
-                            progressText!!.text = "${(percent * 100).toInt()}% Complete"
-                        }
+                        downloadFile(download, zeriteLibraryJar, progressBar, progressText)
                     }
 
                     // Set status
                     subheaderText!!.text = "Downloading Launch Wrapper"
                     progressBar!!.progress = 0.0
+                    progressText!!.text = "0% Complete"
 
                     // Download launchwrapper
-                    downloadFile(launchWrapperURL, launchWrapperJar) { bytesRead, contentLength, _ ->
-                        val percent = bytesRead.toDouble() / contentLength
-                        progressBar!!.progress = percent
-                        progressText!!.text = "${(percent * 100).toInt()}% Complete"
-                    }
+                    downloadFile(launchWrapperURL, launchWrapperJar, progressBar, progressText)
 
                     val useOptifine = StorageModel.optifine && StorageModel.optifineUrl.isNotEmpty()
 
@@ -137,22 +130,19 @@ class InstallingStage : View() {
                         // Set status
                         subheaderText!!.text = "Downloading OptiFine"
                         progressBar!!.progress = 0.0
+                        progressText!!.text = "0% Complete"
 
                         // Temp file
                         val tempJar = File.createTempFile("OptiFine", ".jar")
 
                         // Download OptiFine
-                        downloadFile(StorageModel.optifineUrl, tempJar) { bytesRead, contentLength, _ ->
-                            val percent = bytesRead.toDouble() / contentLength
-                            progressBar!!.progress = percent
-                            progressText!!.text = "${(percent * 100).toInt()}% Complete"
-                        }
+                        downloadFile(StorageModel.optifineUrl, tempJar, progressBar, progressText)
 
                         // Set status
                         headerText!!.text = "Patching"
                         subheaderText!!.text = "Patching OptiFine"
-                        progressBar!!.progress = 0.0
-                        progressText!!.text = "0% Complete"
+                        progressBar!!.progress = 0.5
+                        progressText!!.text = "50% Complete"
 
                         // Patch
                         val child = URLClassLoader(arrayOf<URL>(tempJar.toURI().toURL()), javaClass.classLoader)
