@@ -2,6 +2,7 @@ package net.zeriteclient.installer.stages
 
 import com.google.gson.Gson
 import com.jfoenix.controls.JFXProgressBar
+import javafx.application.Platform
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
@@ -30,6 +31,8 @@ import java.util.*
 class InstallingStage : View() {
 
     override val root = stackpane {
+        Thread.setDefaultUncaughtExceptionHandler { _, e -> e.printStackTrace() }
+
         try {
             var progressBar: JFXProgressBar? = null
             var headerText: Text? = null
@@ -85,6 +88,8 @@ class InstallingStage : View() {
 
             vgrow = Priority.ALWAYS
             GlobalScope.launch {
+                Thread.setDefaultUncaughtExceptionHandler { _, e -> e.printStackTrace() }
+
                 try {
                     while (find<InstallerUI>().root.selectionModel.selectedIndex < 3) {
                     }
@@ -115,10 +120,12 @@ class InstallingStage : View() {
                         downloadFile(download, zeriteLibraryJar, progressBar, progressText)
                     }
 
-                    // Set status
-                    subheaderText!!.text = "Downloading Launch Wrapper"
-                    progressBar!!.progress = 0.0
-                    progressText!!.text = "0% Complete"
+                    Platform.runLater {
+                        // Set status
+                        subheaderText!!.text = "Downloading Launch Wrapper"
+                        progressBar!!.progress = 0.0
+                        progressText!!.text = "0% Complete"
+                    }
 
                     // Download launchwrapper
                     downloadFile(launchWrapperURL, launchWrapperJar, progressBar, progressText)
@@ -127,10 +134,12 @@ class InstallingStage : View() {
 
                     // Check for OptiFine compat
                     if (useOptifine) {
-                        // Set status
-                        subheaderText!!.text = "Downloading OptiFine"
-                        progressBar!!.progress = 0.0
-                        progressText!!.text = "0% Complete"
+                        Platform.runLater {
+                            // Set status
+                            subheaderText!!.text = "Downloading OptiFine"
+                            progressBar!!.progress = 0.0
+                            progressText!!.text = "0% Complete"
+                        }
 
                         // Temp file
                         val tempJar = File.createTempFile("OptiFine", ".jar")
@@ -138,11 +147,13 @@ class InstallingStage : View() {
                         // Download OptiFine
                         downloadFile(StorageModel.optifineUrl, tempJar, progressBar, progressText)
 
-                        // Set status
-                        headerText!!.text = "Patching"
-                        subheaderText!!.text = "Patching OptiFine"
-                        progressBar!!.progress = 0.5
-                        progressText!!.text = "50% Complete"
+                        Platform.runLater {
+                            // Set status
+                            headerText!!.text = "Patching"
+                            subheaderText!!.text = "Patching OptiFine"
+                            progressBar!!.progress = 0.5
+                            progressText!!.text = "50% Complete"
+                        }
 
                         // Patch
                         val child = URLClassLoader(arrayOf<URL>(tempJar.toURI().toURL()), javaClass.classLoader)
@@ -151,11 +162,13 @@ class InstallingStage : View() {
                         method.invoke(null, baseVersionJar, tempJar, optiFineJar)
                     }
 
-                    // Set status
-                    headerText!!.text = "Creating profile"
-                    subheaderText!!.text = "Reading base profile"
-                    progressBar!!.progress = 0.0
-                    progressText!!.text = "0% Complete"
+                    Platform.runLater {
+                        // Set status
+                        headerText!!.text = "Creating profile"
+                        subheaderText!!.text = "Reading base profile"
+                        progressBar!!.progress = 0.0
+                        progressText!!.text = "0% Complete"
+                    }
 
                     // Create JSON parser
                     val gson = Gson()
@@ -179,10 +192,12 @@ class InstallingStage : View() {
                         profile.libraries.add(Library(optiFineMaven, null, null, null, null))
                     }
 
-                    // Set status
-                    subheaderText!!.text = "Writing new profile"
-                    progressBar!!.progress = 0.25
-                    progressText!!.text = "25% Complete"
+                    Platform.runLater {
+                        // Set status
+                        subheaderText!!.text = "Writing new profile"
+                        progressBar!!.progress = 0.25
+                        progressText!!.text = "25% Complete"
+                    }
 
                     // Write profile
                     zeriteVersionJson.writeText(gson.toJson(profile))
@@ -190,10 +205,12 @@ class InstallingStage : View() {
                     // Copy old JAR
                     zeriteVersionJar.writeBytes(baseVersionJar.readBytes())
 
-                    // Set status
-                    subheaderText!!.text = "Reading launcher profiles"
-                    progressBar!!.progress = 0.5
-                    progressText!!.text = "50% Complete"
+                    Platform.runLater {
+                        // Set status
+                        subheaderText!!.text = "Reading launcher profiles"
+                        progressBar!!.progress = 0.5
+                        progressText!!.text = "50% Complete"
+                    }
 
                     // Read to JSON object
                     val profiles = gson.fromJson(launcherProfilesJson.readText(), LauncherProfiles::class.java)
@@ -205,19 +222,23 @@ class InstallingStage : View() {
                     // Add profile
                     profiles.profiles["Zerite"] = LauncherProfile(dateString, icon, null, dateString, "Zerite", "Zerite", "custom")
 
-                    // Set status
-                    subheaderText!!.text = "Writing launcher profiles"
-                    progressBar!!.progress = 0.75
-                    progressText!!.text = "75% Complete"
+                    Platform.runLater {
+                        // Set status
+                        subheaderText!!.text = "Writing launcher profiles"
+                        progressBar!!.progress = 0.75
+                        progressText!!.text = "75% Complete"
+                    }
 
                     // Write JSON
                     launcherProfilesJson.writeText(gson.toJson(profiles))
 
-                    // Set status
-                    headerText!!.text = "Completed!"
-                    subheaderText!!.text = "Open the Minecraft launcher to play"
-                    progressBar!!.progress = 1.0
-                    progressText!!.text = "100% Complete"
+                    Platform.runLater {
+                        // Set status
+                        headerText!!.text = "Completed!"
+                        subheaderText!!.text = "Open the Minecraft launcher to play"
+                        progressBar!!.progress = 1.0
+                        progressText!!.text = "100% Complete"
+                    }
                 } catch (e: Exception) {
                 }
             }
