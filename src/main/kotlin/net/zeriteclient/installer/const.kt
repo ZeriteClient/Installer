@@ -36,4 +36,4 @@ val optiFineJar = File(optiFineDir, "OptiFine-Zerite.jar")
 const val optiFineMaven = "optifine:OptiFine:Zerite"
 
 // Other values
-const val tweakClass = "net.zeriteclient.zerite.injection.stages.tweaker.ZeriteTweaker"
+const val tweakClass = "cc.zerite.client.injection.stages.tweaker.ZeriteTweaker"
